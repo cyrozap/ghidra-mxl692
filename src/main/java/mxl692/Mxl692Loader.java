@@ -25,9 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import ghidra.app.util.MemoryBlockUtils;
-import ghidra.app.util.Option;
 import ghidra.app.util.bin.ByteProvider;
-import ghidra.app.util.importer.MessageLog;
 import ghidra.app.util.opinion.AbstractProgramWrapperLoader;
 import ghidra.app.util.opinion.LoadSpec;
 import ghidra.framework.store.LockException;
@@ -40,7 +38,6 @@ import ghidra.program.model.mem.Memory;
 import ghidra.program.model.mem.MemoryBlock;
 import ghidra.program.model.mem.MemoryConflictException;
 import ghidra.util.exception.CancelledException;
-import ghidra.util.task.TaskMonitor;
 
 /**
  * A loader for MxL692 firmware images.
@@ -92,12 +89,13 @@ public class Mxl692Loader extends AbstractProgramWrapperLoader {
 	}
 
 	@Override
-	protected void load(ByteProvider provider, LoadSpec loadSpec, List<Option> options,
-			Program program, TaskMonitor monitor, MessageLog log)
+	protected void load(Program program, ImporterSettings settings)
 			throws CancelledException, IOException {
 		Memory mem = program.getMemory();
 		FlatProgramAPI api = new FlatProgramAPI(program);
-		FileBytes fileBytes = MemoryBlockUtils.createFileBytes(program, provider, monitor);
+
+		ByteProvider provider = settings.provider();
+		FileBytes fileBytes = MemoryBlockUtils.createFileBytes(program, provider, settings.monitor());
 
 		// Read and validate header
 		byte[] headerBytes = provider.readBytes(0, 8);
